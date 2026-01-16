@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -122,11 +124,27 @@ fun TodoScreen(viewModel: TodoViewModel) {
         Spacer(Modifier.height(4.dp))
 
         Row {
-            Button(onClick = { showDatePicker = true }, Modifier.weight(1f)) {
+            Button(
+                onClick = { showDatePicker = true },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                modifier = Modifier.weight(1f)
+            ) {
                 Text("Pick date")
             }
             Spacer(Modifier.height(4.dp))
-            Button(onClick = { showTimePicker = true }, Modifier.weight(1f)) {
+            Button(
+                onClick = { showTimePicker = true },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                modifier = Modifier.weight(1f)
+            ) {
                 Text("Pick time")
             }
         }
@@ -146,6 +164,11 @@ fun TodoScreen(viewModel: TodoViewModel) {
                     description = ""
                 }
             },
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            ),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Add task")
@@ -176,6 +199,11 @@ fun TodoScreen(viewModel: TodoViewModel) {
 
                         Button(
                             onClick = { viewModel.complete(todo) },
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Complete")
@@ -199,7 +227,12 @@ fun TodoScreen(viewModel: TodoViewModel) {
                                 selectedDay = cal.get(Calendar.DAY_OF_MONTH)
                             }
                             showDatePicker = false
-                        }
+                        },
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
                     ) { Text("OK") }
                 }
             ) {
@@ -223,7 +256,14 @@ fun TodoScreen(viewModel: TodoViewModel) {
                     }) { Text("OK") }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showTimePicker = false }) { Text("Cancel") }
+                    TextButton(
+                        onClick = { showTimePicker = false },
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                    ) { Text("Cancel") }
                 },
                 text = { TimePicker(state = timeState)}
             )
