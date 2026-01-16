@@ -3,7 +3,6 @@ package no.emil.organizer.data.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import no.emil.organizer.data.models.Note
-import no.emil.organizer.data.database.NoteDao
 import no.emil.organizer.data.models.TodoInstance
 import no.emil.organizer.data.models.TodoItem
 
