@@ -1,6 +1,7 @@
 package no.emil.organizer.ui.screens
 
-import android.app.TimePickerDialog
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -34,14 +36,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import no.emil.organizer.viewmodels.TodoViewModel
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-fun formatDue(dueMillis: Long): String {
-    val now = Calendar.getInstance().timeInMillis
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+fun formatDue(dueMillis: Long, now: Long): String {
     val diff = dueMillis - now
 
     if (diff <= 0) return "Overdue"
@@ -50,15 +56,36 @@ fun formatDue(dueMillis: Long): String {
     val hours = TimeUnit.MILLISECONDS.toHours(diff)
     val days = TimeUnit.MILLISECONDS.toDays(diff)
 
+    val today = LocalDate.ofInstant(Instant.ofEpochMilli(now), ZoneId.systemDefault())
+    val dueDate = LocalDate.ofInstant(Instant.ofEpochMilli(dueMillis), ZoneId.systemDefault())
+
     return when {
         minutes < 60 -> "$minutes min"
-        hours < 24 -> "$hours hrs"
-        days == 1L -> "Tomorrow"
+        hours < 24 && today == dueDate -> "$hours hrs"
+        dueDate == today.plusDays(1) -> "Tomorrow"
         else -> {
             val sdf = SimpleDateFormat("dd MMM", Locale.getDefault())
             sdf.format(dueMillis)
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+@Composable
+fun DueText(dueMillis: Long) {
+    var now by remember { mutableStateOf(System.currentTimeMillis()) }
+
+    LaunchedEffect(dueMillis) {
+        while (true) {
+            now = System.currentTimeMillis()
+            delay(60_000L)
+        }
+    }
+
+    Text(
+        text = formatDue(dueMillis, now),
+        style = MaterialTheme.typography.bodySmall
+    )
 }
 
 
@@ -190,10 +217,10 @@ fun TodoScreen(viewModel: TodoViewModel) {
                         if (todo.item.description.isNotBlank()) {
                             Text(todo.item.description, style = MaterialTheme.typography.bodyMedium)
                         }
-                        Text(
-                            "Due: ${formatDue(todo.instance.dueTimestamp)}",
-                            style = MaterialTheme.typography.bodySmall
-                        )
+
+                        Spacer(Modifier.height(4.dp))
+
+                        DueText(todo.instance.dueTimestamp)
 
                         Spacer(Modifier.height(4.dp))
 
