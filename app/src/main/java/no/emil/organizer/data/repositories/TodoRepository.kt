@@ -11,7 +11,7 @@ class TodoRepository(
     private val itemDao: TodoItemDao,
     private val instanceDao: TodoInstanceDao
 ) {
-    fun getUpcomingTodos(): Flow<List<TodoWithInstance>> = instanceDao.getUpcomingWithItem()
+    fun getUpcomingTodos(startOfToday: Long): Flow<List<TodoWithInstance>> = instanceDao.getUpcomingWithItem(startOfToday)
 
     suspend fun createTodo(
         item: TodoItem,
@@ -31,5 +31,9 @@ class TodoRepository(
 
     suspend fun markCompleted(instance: TodoInstance) {
         instanceDao.markCompleted(instance.id)
+    }
+
+    suspend fun markUncompleted(instance: TodoInstance) {
+        instanceDao.markUncompleted(instance.id)
     }
 }

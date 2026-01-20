@@ -2,6 +2,7 @@ package no.emil.organizer.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,7 +56,7 @@ fun formatDue(dueMillis: Long, now: Long): String {
 
     val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
     val hours = TimeUnit.MILLISECONDS.toHours(diff)
-    val days = TimeUnit.MILLISECONDS.toDays(diff)
+    //val days = TimeUnit.MILLISECONDS.toDays(diff)
 
     val today = LocalDate.ofInstant(Instant.ofEpochMilli(now), ZoneId.systemDefault())
     val dueDate = LocalDate.ofInstant(Instant.ofEpochMilli(dueMillis), ZoneId.systemDefault())
@@ -72,8 +74,12 @@ fun formatDue(dueMillis: Long, now: Long): String {
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
-fun DueText(dueMillis: Long) {
-    var now by remember { mutableStateOf(System.currentTimeMillis()) }
+fun DueText(
+    dueMillis: Long,
+    isCompleted: Boolean,
+    onToggleCompleted: () -> Unit
+) {
+    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     LaunchedEffect(dueMillis) {
         while (true) {
@@ -83,12 +89,17 @@ fun DueText(dueMillis: Long) {
     }
 
     Text(
-        text = formatDue(dueMillis, now),
-        style = MaterialTheme.typography.bodySmall
+        text = if (isCompleted) "Completed"
+                else formatDue(dueMillis, now),
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.clickable {
+            onToggleCompleted()
+        }
     )
 }
 
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(viewModel: TodoViewModel) {
@@ -220,21 +231,14 @@ fun TodoScreen(viewModel: TodoViewModel) {
 
                         Spacer(Modifier.height(4.dp))
 
-                        DueText(todo.instance.dueTimestamp)
+                        DueText(
+                            todo.instance.dueTimestamp,
+                            isCompleted = todo.instance.completed,
+                            onToggleCompleted = {
+                                viewModel.toggleCompleted(todo)
+                            }
+                        )
 
-                        Spacer(Modifier.height(4.dp))
-
-                        Button(
-                            onClick = { viewModel.complete(todo) },
-                            shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Complete")
-                        }
                     }
                 }
             }

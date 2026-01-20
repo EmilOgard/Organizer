@@ -47,11 +47,22 @@ interface TodoInstanceDao {
         timestamp: Long = System.currentTimeMillis()
     )
 
+    @Query("""
+        UPDATE todo_instances
+        SET completed = 0,
+        completedTimestamp = NULL
+        WHERE id = :id
+    """)
+    suspend fun markUncompleted(
+        id: Long
+    )
+
     @Transaction
     @Query("""
         SELECT * FROM todo_instances
         WHERE completed = 0
+            OR completedTimestamp >= :startOfToday
         ORDER BY dueTimestamp ASC
     """)
-    fun getUpcomingWithItem(): Flow<List<TodoWithInstance>>
+    fun getUpcomingWithItem(startOfToday: Long): Flow<List<TodoWithInstance>>
 }
