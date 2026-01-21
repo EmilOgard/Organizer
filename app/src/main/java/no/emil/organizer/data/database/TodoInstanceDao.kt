@@ -65,4 +65,11 @@ interface TodoInstanceDao {
         ORDER BY dueTimestamp ASC
     """)
     fun getUpcomingWithItem(startOfToday: Long): Flow<List<TodoWithInstance>>
+
+    @Query("""
+        UPDATE todo_instances
+        SET dueTimestamp = :newDue
+        WHERE id = :id
+    """)
+    suspend fun updateDueTimestamp(id: Long, newDue: Long)
 }

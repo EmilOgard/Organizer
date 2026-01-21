@@ -80,4 +80,13 @@ class TodoViewModel(
             }
         }
     }
+
+    fun adjustDue(todo: TodoWithInstance, deltaMillis: Long) {
+        viewModelScope.launch {
+            repo.updateDue(
+                todo.instance.id,
+                todo.instance.dueTimestamp + deltaMillis
+            )
+        }
+    }
 }

@@ -36,4 +36,8 @@ class TodoRepository(
     suspend fun markUncompleted(instance: TodoInstance) {
         instanceDao.markUncompleted(instance.id)
     }
+
+    suspend fun updateDue(id: Long, newDue: Long) {
+        instanceDao.updateDueTimestamp(id, newDue);
+    }
 }

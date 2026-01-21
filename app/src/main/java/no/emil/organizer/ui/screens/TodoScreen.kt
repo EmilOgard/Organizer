@@ -36,9 +36,11 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import no.emil.organizer.data.models.TodoWithInstance
 import no.emil.organizer.viewmodels.TodoViewModel
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -226,18 +228,28 @@ fun TodoScreen(viewModel: TodoViewModel) {
                     Column(Modifier.padding(12.dp)) {
                         Text(todo.item.title, style = MaterialTheme.typography.titleMedium)
                         if (todo.item.description.isNotBlank()) {
-                            Text(todo.item.description, style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                todo.item.description,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
 
                         Spacer(Modifier.height(4.dp))
 
-                        DueText(
-                            todo.instance.dueTimestamp,
-                            isCompleted = todo.instance.completed,
-                            onToggleCompleted = {
-                                viewModel.toggleCompleted(todo)
-                            }
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            DueText(
+                                todo.instance.dueTimestamp,
+                                isCompleted = todo.instance.completed,
+                                onToggleCompleted = {
+                                    viewModel.toggleCompleted(todo)
+                                }
+                            )
+
+                            Spacer(Modifier.weight(1f))
+
+                            AdjustButtons(viewModel, todo)
+
+                        }
 
                     }
                 }
@@ -300,4 +312,44 @@ fun TodoScreen(viewModel: TodoViewModel) {
             )
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun AdjustButtons(
+    viewModel: TodoViewModel,
+    todo: TodoWithInstance
+) {
+    Row {
+        AdjustButton("+1h"){
+            viewModel.adjustDue(todo, TimeUnit.HOURS.toMillis(1))
+        }
+
+        AdjustButton("-1h"){
+            viewModel.adjustDue(todo, -TimeUnit.HOURS.toMillis(1))
+        }
+
+        AdjustButton("+1d") {
+            viewModel.adjustDue(todo, TimeUnit.DAYS.toMillis(1))
+        }
+
+        AdjustButton("-1d"){
+            viewModel.adjustDue(todo, -TimeUnit.DAYS.toMillis(1))
+        }
+    }
+}
+
+@Composable
+private fun AdjustButton(
+    text: String,
+    onClick: () -> Unit
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .clickable { onClick() },
+        color = MaterialTheme.colorScheme.primary
+    )
 }
